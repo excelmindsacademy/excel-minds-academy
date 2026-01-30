@@ -1,40 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Excel Minds Academy - Inquiry</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial; padding: 15px; }
-    input, select, button {
-      width: 100%; padding: 10px; margin-top: 10px;
-      font-size: 16px;
-    }
-    button {
-      background: #1e88e5; color: #fff; border: none;
-    }
-  </style>
-</head>
-<body>
-
-<h2>Student Inquiry Form</h2>
-
-<input id="student" placeholder="Student Name">
-<input id="parent" placeholder="Parent Name">
-<input id="mobile" placeholder="Mobile Number">
-<select id="class">
-  <option value="">Select Class</option>
-  <option>6th</option><option>7th</option><option>8th</option>
-  <option>9th</option><option>10th</option>
-</select>
-<select id="board">
-  <option value="">Select Board</option>
-  <option>SSC</option><option>CBSE</option><option>ICSE</option>
-</select>
-
-<button onclick="submitForm()">Submit Inquiry</button>
-
-<p id="msg"></p>
-
 <script>
 function submitForm() {
   var data = {
@@ -46,21 +9,16 @@ function submitForm() {
     board: document.getElementById("board").value
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbzR-A12olI-JiqBYLxsQ277mma3jLDsA6WaHADwU4BN1C549llDrx6PQcUFMaBgCRsb/exec", {
+  fetch("YOUR_WEB_APP_URL", {
     method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify(data)
-  })
-  .then(res => res.text())
-  .then(txt => {
-    document.getElementById("msg").innerHTML =
-      "Inquiry Saved Successfully ✅";
-  })
-  .catch(err => {
-    document.getElementById("msg").innerHTML =
-      "Error saving inquiry ❌";
   });
+
+  document.getElementById("msg").innerHTML =
+    "Inquiry Submitted Successfully ✅";
 }
 </script>
-
-</body>
-</html>
