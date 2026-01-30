@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Excel Minds Academy – Inquiry Form</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;background:#f4f6f8;margin:0;padding:20px}
+h1{text-align:center;color:#1a237e}
+form,table{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px}
+input,select,button{width:100%;padding:10px;margin:6px 0}
+button{background:#1a237e;color:#fff;border:none;border-radius:5px;cursor:pointer}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+.whatsapp{background:#25D366}
+.export{background:#ff9800}
+</style>
+</head>
+
+<body>
+
+<h1>📘 Excel Minds Academy – Inquiry Form</h1>
+
+<form id="inquiryForm">
+<input type="text" id="student" placeholder="Student Name" required>
+<input type="text" id="parent" placeholder="Parent Name" required>
+<input type="tel" id="mobile" placeholder="Mobile Number" required>
+<select id="class">
+<option>6th</option><option>7th</option><option>8th</option>
+<option>9th</option><option>10th</option>
+</select>
+<select id="board">
+<option>SSC</option><option>CBSE</option><option>ICSE</option>
+</select>
+<button type="submit">Save Inquiry</button>
+</form>
+
+<button class="export" onclick="exportCSV()">📤 Export to Excel</button>
+
+<table>
+<thead>
+<tr>
+<th>Date</th><th>Student</th><th>Parent</th><th>Mobile</th>
+<th>Class</th><th>Board</th><th>WhatsApp</th>
+</tr>
+</thead>
+<tbody id="records"></tbody>
+</table>
+
+<script>
+let data = JSON.parse(localStorage.getItem("inquiries") || "[]");
+
+function load(){
+let rows="";
+data.forEach((d,i)=>{
+rows+=`<tr>
+<td>${d.date}</td><td>${d.student}</td><td>${d.parent}</td>
+<td>${d.mobile}</td><td>${d.class}</td><td>${d.board}</td>
+<td><button class="whatsapp" onclick="send(${i})">Send</button></td>
+</tr>`;
+});
+document.getElementById("records").innerHTML=rows;
+}
+load();
+
+document.getElementById("inquiryForm").onsubmit=e=>{
+e.preventDefault();
+let d={
+date:new Date().toLocaleString(),
+student:student.value,
+parent:parent.value,
+mobile:mobile.value,
+class:document.getElementById("class").value,
+board:document.getElementById("board").value
+};
+data.push(d);
+localStorage.setItem("inquiries",JSON.stringify(data));
+e.target.reset();
+load();
+};
+
+function send(i){
+let d=data[i];
+let msg=`Excel Minds Academy Inquiry%0A
+Student: ${d.student}%0A
+Parent: ${d.parent}%0A
+Mobile: ${d.mobile}%0A
+Class: ${d.class}%0A
+Board: ${d.board}`;
+window.open(`https://wa.me/918208827251?text=${msg}`);
+}
+
+function exportCSV(){
+let csv="Date,Student,Parent,Mobile,Class,Board\n";
+data.forEach(d=>{
+csv+=`${d.date},${d.student},${d.parent},${d.mobile},${d.class},${d.board}\n`;
+});
+let blob=new Blob([csv],{type:"text/csv"});
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="Excel_Minds_Inquiries.csv";
+a.click();
+}
+</script>
+
+</body>
+</html>
