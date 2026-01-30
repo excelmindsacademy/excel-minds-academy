@@ -1,5 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Excel Minds Academy - Inquiry</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<h2>Student Inquiry Form</h2>
+
+<input id="student" placeholder="Student Name"><br><br>
+<input id="parent" placeholder="Parent Name"><br><br>
+<input id="mobile" placeholder="Mobile Number"><br><br>
+
+<select id="class">
+  <option value="">Select Class</option>
+  <option>6th</option>
+  <option>7th</option>
+  <option>8th</option>
+  <option>9th</option>
+  <option>10th</option>
+</select><br><br>
+
+<select id="board">
+  <option value="">Select Board</option>
+  <option>SSC</option>
+  <option>CBSE</option>
+  <option>ICSE</option>
+</select><br><br>
+
+<button type="button" id="btn">Submit Inquiry</button>
+
+<p id="msg"></p>
+
 <script>
 document.getElementById("btn").addEventListener("click", function () {
+
+  alert("Submitting inquiry...");
 
   var formData = new FormData();
   formData.append("student", document.getElementById("student").value);
@@ -11,9 +47,18 @@ document.getElementById("btn").addEventListener("click", function () {
   fetch("https://script.google.com/macros/s/AKfycbzR-A12olI-JiqBYLxsQ277mma3jLDsA6WaHADwU4BN1C549llDrx6PQcUFMaBgCRsb/exec", {
     method: "POST",
     body: formData
+  })
+  .then(() => {
+    document.getElementById("msg").innerHTML =
+      "Inquiry Submitted Successfully ✅";
+  })
+  .catch(() => {
+    document.getElementById("msg").innerHTML =
+      "Error submitting inquiry ❌";
   });
 
-  document.getElementById("msg").innerHTML =
-    "Inquiry Submitted Successfully ✅";
 });
 </script>
+
+</body>
+</html>
