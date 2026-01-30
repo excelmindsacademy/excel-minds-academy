@@ -1,104 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Excel Minds Academy – Inquiry Form</title>
+<title>Excel Minds Academy – Student Management</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{font-family:Arial;background:#f4f6f8;margin:0;padding:20px}
-h1{text-align:center;color:#1a237e}
+body{font-family:Arial;background:#eef2f5;padding:15px}
+h2{text-align:center;color:#0d47a1}
 form,table{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px}
 input,select,button{width:100%;padding:10px;margin:6px 0}
-button{background:#1a237e;color:#fff;border:none;border-radius:5px;cursor:pointer}
-table{width:100%;border-collapse:collapse}
-th,td{border:1px solid #ccc;padding:8px;text-align:center}
+button{background:#0d47a1;color:white;border:none;border-radius:5px}
 .whatsapp{background:#25D366}
+.call{background:#ff5722}
 .export{background:#ff9800}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:6px;font-size:13px;text-align:center}
 </style>
 </head>
 
 <body>
 
-<h1>📘 Excel Minds Academy – Inquiry Form</h1>
+<h2>📘 Excel Minds Academy – Student Entry</h2>
 
-<form id="inquiryForm">
-<input type="text" id="student" placeholder="Student Name" required>
-<input type="text" id="parentName" placeholder="Parent Name" required>
-<input type="tel" id="mobile" placeholder="Mobile Number" required>
+<form id="form">
+<input id="studentName" placeholder="Student Name" required>
+<input id="parentName" placeholder="Parent Name" required>
+<input id="mobile" placeholder="Mobile Number" required>
+
 <select id="class">
 <option>6th</option><option>7th</option><option>8th</option>
 <option>9th</option><option>10th</option>
 </select>
+
 <select id="board">
 <option>SSC</option><option>CBSE</option><option>ICSE</option>
 </select>
-<button type="submit">Save Inquiry</button>
+
+<input id="totalFees" placeholder="Total Fees" type="number" required>
+
+<select id="plan">
+<option>Yearly</option>
+<option>Half-Yearly</option>
+<option>Quarterly</option>
+</select>
+
+<input id="paid" placeholder="Paid Amount" type="number" required>
+<input id="nextDate" type="date" required>
+
+<button type="submit">Save Record</button>
 </form>
 
-<button class="export" onclick="exportCSV()">📤 Export to Excel</button>
+<button class="export" onclick="exportExcel()">Export to Excel</button>
 
 <table>
 <thead>
 <tr>
-<th>Date</th><th>Student</th><th>Parent</th><th>Mobile</th>
-<th>Class</th><th>Board</th><th>WhatsApp</th>
+<th>Student</th><th>Parent</th><th>Mobile</th>
+<th>Class</th><th>Fees</th><th>Paid</th><th>Due</th>
+<th>Plan</th><th>Next Date</th><th>Call</th><th>WhatsApp</th>
 </tr>
 </thead>
-<tbody id="records"></tbody>
+<tbody id="list"></tbody>
 </table>
 
 <script>
-let data = JSON.parse(localStorage.getItem("inquiries") || "[]");
+let records = JSON.parse(localStorage.getItem("ema") || "[]");
 
 function load(){
-let rows="";
-data.forEach((d,i)=>{
-rows+=`<tr>
-<td>${d.date}</td><td>${d.student}</td><td>${d.parent}</td>
-<td>${d.mobile}</td><td>${d.class}</td><td>${d.board}</td>
-<td><button class="whatsapp" onclick="send(${i})">Send</button></td>
+let html="";
+records.forEach((r,i)=>{
+html+=`<tr>
+<td>${r.student}</td>
+<td>${r.parent}</td>
+<td>${r.mobile}</td>
+<td>${r.class}</td>
+<td>${r.total}</td>
+<td>${r.paid}</td>
+<td>${r.due}</td>
+<td>${r.plan}</td>
+<td>${r.next}</td>
+<td><a href="tel:${r.mobile}"><button class="call">Call</button></a></td>
+<td><button class="whatsapp" onclick="msg(${i})">Send</button></td>
 </tr>`;
 });
-document.getElementById("records").innerHTML=rows;
+list.innerHTML=html;
 }
 load();
 
-document.getElementById("inquiryForm").onsubmit=e=>{
+form.onsubmit=e=>{
 e.preventDefault();
-let d={
-date:new Date().toLocaleString(),
-student:student.value,
-parent:parent.value,
+let total=+totalFees.value;
+let paidAmt=+paid.value;
+let data={
+student:studentName.value,
+parent:parentName.value,
 mobile:mobile.value,
 class:document.getElementById("class").value,
-board:document.getElementById("board").value
+board:board.value,
+total:total,
+paid:paidAmt,
+due:total-paidAmt,
+plan:plan.value,
+next:nextDate.value
 };
-data.push(d);
-localStorage.setItem("inquiries",JSON.stringify(data));
-e.target.reset();
+records.push(data);
+localStorage.setItem("ema",JSON.stringify(records));
+form.reset();
 load();
 };
 
-function send(i){
-let d=data[i];
-let msg=`Excel Minds Academy Inquiry%0A
-Student: ${d.student}%0A
-Parent: ${d.parent}%0A
-Mobile: ${d.mobile}%0A
-Class: ${d.class}%0A
-Board: ${d.board}`;
-window.open(`https://wa.me/918208827251?text=${msg}`);
+function msg(i){
+let r=records[i];
+let text=`Excel Minds Academy Fee Reminder%0A
+Student: ${r.student}%0A
+Total Fees: ${r.total}%0A
+Paid: ${r.paid}%0A
+Due: ${r.due}%0A
+Next Date: ${r.next}`;
+window.open(`https://wa.me/918208827251?text=${text}`);
 }
 
-function exportCSV(){
-let csv="Date,Student,Parent,Mobile,Class,Board\n";
-data.forEach(d=>{
-csv+=`${d.date},${d.student},${d.parent},${d.mobile},${d.class},${d.board}\n`;
+function exportExcel(){
+let csv="Student,Parent,Mobile,Class,Total,Paid,Due,Plan,NextDate\n";
+records.forEach(r=>{
+csv+=`${r.student},${r.parent},${r.mobile},${r.class},${r.total},${r.paid},${r.due},${r.plan},${r.next}\n`;
 });
-let blob=new Blob([csv],{type:"text/csv"});
+let blob=new Blob([csv]);
 let a=document.createElement("a");
 a.href=URL.createObjectURL(blob);
-a.download="Excel_Minds_Inquiries.csv";
+a.download="EMA_Records.csv";
 a.click();
 }
 </script>
