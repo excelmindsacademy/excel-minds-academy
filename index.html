@@ -1,5 +1,7 @@
 <script>
 function submitForm() {
+  alert("Button clicked ✅");
+
   var data = {
     type: "inquiry",
     student: document.getElementById("student").value,
@@ -9,7 +11,7 @@ function submitForm() {
     board: document.getElementById("board").value
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbzR-A12olI-JiqBYLxsQ277mma3jLDsA6WaHADwU4BN1C549llDrx6PQcUFMaBgCRsb/exec", {
+  fetch("YOUR_WEB_APP_URL", {
     method: "POST",
     mode: "no-cors",
     headers: {
