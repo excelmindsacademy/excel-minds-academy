@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Excel Minds Academy – IMS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- APP LOOK -->
+<meta name="theme-color" content="#0b3c91">
+
+<style>
+body{font-family:Arial;background:#eef2f5;margin:0;padding:10px}
+h2{text-align:center;color:#0b3c91}
+.box{background:#fff;padding:12px;border-radius:8px;margin-bottom:12px}
+input,select,button{width:100%;padding:8px;margin:5px 0}
+button{border:none;border-radius:5px;color:white}
+.login{background:#0b3c91}
+.save{background:#0b3c91}
+.call{background:#ff5722}
+.wa{background:#25D366}
+.logout{background:#9e9e9e}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{border:1px solid #ccc;padding:5px;text-align:center}
+.due{background:#ffcdd2}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginBox" class="box">
+<h2>🔐 Admin Login</h2>
+<input id="pwd" type="password" placeholder="Enter Password">
+<button class="login" onclick="login()">Login</button>
+</div>
+
+<!-- MAIN -->
+<div id="main" style="display:none">
+
+<h2>📘 Excel Minds Academy</h2>
+<button class="logout" onclick="logout()">Logout</button>
+
+<div class="box">
+<h3>Student Entry</h3>
+<input id="student" placeholder="Student Name">
+<input id="parent" placeholder="Parent Name">
+<input id="mobile" placeholder="Mobile Number">
+<select id="class">
+<option>6th</option><option>7th</option><option>8th</option>
+<option>9th</option><option>10th</option>
+</select>
+<select id="board">
+<option>SSC</option><option>CBSE</option><option>ICSE</option>
+</select>
+<input id="total" type="number" placeholder="Total Fees">
+<select id="plan">
+<option>Yearly</option>
+<option>Half-Yearly</option>
+<option>Quarterly</option>
+</select>
+<input id="paid" type="number" placeholder="Paid Amount">
+<input id="next" type="date">
+<button class="save" onclick="save()">Save Student</button>
+</div>
+
+<div class="box">
+<h3>Records</h3>
+<table>
+<thead>
+<tr>
+<th>Student</th><th>Due</th><th>Next</th>
+<th>Call</th><th>WA</th><th>Receipt</th>
+</tr>
+</thead>
+<tbody id="list"></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+const ADMIN="1234"; // change password here
+let data=JSON.parse(localStorage.getItem("EMA")||"[]");
+
+function login(){
+ if(pwd.value===ADMIN){
+  sessionStorage.setItem("login",1);
+  show();
+ }else alert("Wrong Password");
+}
+function logout(){
+ sessionStorage.removeItem("login");
+ location.reload();
+}
+function show(){
+ loginBox.style.display="none";
+ main.style.display="block";
+ load();
+}
+if(sessionStorage.getItem("login")) show();
+
+function save(){
+ let t=+total.value,p=+paid.value;
+ let d={
+ student:student.value,
+ parent:parent.value,
+ mobile:mobile.value,
+ total:t,paid:p,
+ due:t-p,
+ next:next.value
+ };
+ data.push(d);
+ localStorage.setItem("EMA",JSON.stringify(data));
+ sendToSheet(d);
+ load();
+}
+
+function load(){
+ list.innerHTML="";
+ data.forEach((d,i)=>{
+ let tr=document.createElement("tr");
+ if(d.due>0 && new Date(d.next)<=new Date()) tr.className="due";
+ tr.innerHTML=`
+ <td>${d.student}</td>
+ <td>${d.due}</td>
+ <td>${d.next}</td>
+ <td><a href="tel:${d.mobile}"><button class="call">Call</button></a></td>
+ <td><button class="wa" onclick="wa(${i})">WA</button></td>
+ <td><button onclick="receipt(${i})">🧾</button></td>`;
+ list.appendChild(tr);
+ });
+}
+
+function wa(i){
+ let d=data[i];
+ let msg=`Excel Minds Academy Reminder%0AStudent: ${d.student}%0ADue: ${d.due}`;
+ window.open(`https://wa.me/918208827251?text=${msg}`);
+}
+
+function receipt(i){
+ let d=data[i];
+ let w=window.open("");
+ w.document.write(`<h2>Excel Minds Academy</h2>
+ Student: ${d.student}<br>
+ Paid: ${d.paid}<br>
+ Due: ${d.due}`);
+ w.print();
+}
+
+// GOOGLE SHEET SYNC
+function sendToSheet(d){
+ fetch("PASTE_GOOGLE_SCRIPT_URL",{
+  method:"POST",
+  body:JSON.stringify(d)
+ });
+}
+</script>
+
+</body>
+</html>
